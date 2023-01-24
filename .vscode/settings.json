@@ -1,0 +1,23 @@
+{
+  "cssvar.files": [
+    // Or your custom Pollen bundle
+    "./src/styles/pollen.css",
+  ],
+  // Do not ignore css files in node_modules, which is ignored by default
+  "cssvar.ignore": [],
+  // Use Pollen's inbuilt variable ordering
+  "cssvar.disableSort": true,
+  // Add support for autocomplete in other file types
+  "cssvar.extensions": [
+    "css",
+    "html",
+    "jsx",
+    "tsx",
+    "svelte",
+    "scss"
+  ],
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "scss.lint.unknownAtRules": "ignore"
+}
