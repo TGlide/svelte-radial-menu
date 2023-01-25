@@ -4,6 +4,7 @@ specifiers:
   '@fontsource/fira-mono': ^4.5.10
   '@fontsource/inter': ^4.5.15
   '@fontsource/montserrat': ^4.5.14
+  '@iconify/json': ^2.2.11
   '@sveltejs/adapter-auto': ^1.0.0
   '@sveltejs/kit': ^1.0.0
   '@typescript-eslint/eslint-plugin': ^5.45.0
@@ -32,6 +33,7 @@ dependencies:
   '@fontsource/montserrat': 4.5.14
 
 devDependencies:
+  '@iconify/json': 2.2.11
   '@sveltejs/adapter-auto': 1.0.2_@sveltejs+kit@1.2.8
   '@sveltejs/kit': 1.2.8_svelte@3.55.1+vite@4.0.4
   '@typescript-eslint/eslint-plugin': 5.49.0_iu322prlnwsygkcra5kbpy22si
@@ -324,6 +326,13 @@ packages:
 
   /@humanwhocodes/object-schema/1.2.1:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
+    dev: true
+
+  /@iconify/json/2.2.11:
+    resolution: {integrity: sha512-LlFrpRAOFq4zW7tbw3GZPB3GRjtwpXQJIb7bHyFjAQb43FdkOWM01A5tB1WpXDYBq1C4FMIbGusCbrSHlX9jHQ==}
+    dependencies:
+      '@iconify/types': 2.0.0
+      pathe: 1.1.0
     dev: true
 
   /@iconify/types/2.0.0:
@@ -1679,6 +1688,10 @@ packages:
   /path-type/4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
+    dev: true
+
+  /pathe/1.1.0:
+    resolution: {integrity: sha512-ODbEPR0KKHqECXW1GoxdDb+AZvULmXjVPy4rt+pGo2+TnjJTIPJQSVS6N63n8T2Ip+syHhbn52OewKicV0373w==}
     dev: true
 
   /pathval/1.1.1:

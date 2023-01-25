@@ -26,7 +26,8 @@ const config: VitePluginConfig = {
 				selector: (s) => `${s}:hover`
 			};
 		}
-	]
+	],
+	safelist: [...['reload', 'printer'].map((i) => `i-tabler-${i}`)]
 };
 
 export default config;
