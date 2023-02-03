@@ -11,10 +11,14 @@
 		{ icon: 'printer', label: 'print' },
 		{ icon: 'reload', label: 'Reload' },
 		{ icon: 'printer', label: 'print' },
+		{ icon: 'printer', label: 'print' },
+		{ icon: 'printer', label: 'print' },
 	] satisfies MenuItem[];
 
-	const skew = (function getSkew() {
-		switch (menuItems.length) {
+	let numItems = 6;
+
+	$: skew = (function getSkew() {
+		switch (numItems) {
 			case 3:
 				return -30;
 			case 5:
@@ -31,9 +35,13 @@
 	})();
 </script>
 
+<div class="input-wrapper">
+	<input type="range" min="3" max={menuItems.length} bind:value={numItems} />
+</div>
+
 <ul class="radial-menu" style:--skew={`${skew}deg`}>
-	{#each menuItems as item, i}
-		{@const rotate = (360 / menuItems.length) * i - 90}
+	{#each menuItems.slice(0, numItems) as item, i}
+		{@const rotate = (360 / numItems) * i - 90}
 		<li class="item" style:--rotate={`${rotate}deg`}>
 			<div class={`icon i-tabler-${item.icon}`} />
 		</li>
@@ -41,13 +49,24 @@
 </ul>
 
 <style lang="scss">
+	.input-wrapper {
+		position: absolute;
+		top: 128px;
+		left: 50%;
+		translate: -50% 0;
+
+		input {
+			color: red;
+		}
+	}
+
 	.radial-menu {
 		background-color: var(--color-gray-11);
 		border-radius: var(--radius-full);
 
 		overflow: hidden;
 
-		$size: 300rem / 16;
+		$size: toRem(300);
 		width: $size;
 		height: $size;
 
@@ -67,7 +86,7 @@
 			top: 50%;
 			translate: -50% -50%;
 
-			$innerSize: $size * 0.5;
+			$innerSize: calc(0.5 * $size);
 			width: $innerSize;
 			height: $innerSize;
 		}
@@ -75,7 +94,7 @@
 
 	.item {
 		display: block;
-		$itemSize: 200rem / 16;
+		$itemSize: toRem(200);
 		width: $itemSize;
 		height: $itemSize;
 

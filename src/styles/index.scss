@@ -1,27 +1,28 @@
-@import "./reset.css";
-@import "./pollen.css";
-@import "./components/index.scss";
-@import "./fonts.scss";
+@import './reset.css';
+@import './pollen.css';
+@import './components/index.scss';
+@import './functions.scss';
+@import './fonts.scss';
 
 * {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 html {
-  height: 100%;
+	height: 100%;
 }
 
 body {
-  background-color: var(--color-gray-12);
-  color: var(--color-gray-0);
+	background-color: var(--color-gray-12);
+	color: var(--color-gray-0);
 
-  font-family: var(--font-sans);
+	font-family: var(--font-sans);
 
-  // Ensure the body occupies the full viewport height, ignoring the
-  // mobile browser's address bar and other UI elements.
-  // height: calc(100% - env(safe-area-inset-top));
+	// Ensure the body occupies the full viewport height, ignoring the
+	// mobile browser's address bar and other UI elements.
+	// height: calc(100% - env(safe-area-inset-top));
 
-  /* Prevent zoom gestures */
-  // touch-action: pan-x pan-y;
+	/* Prevent zoom gestures */
+	// touch-action: pan-x pan-y;
 }
