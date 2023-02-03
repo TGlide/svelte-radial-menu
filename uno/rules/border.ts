@@ -1,4 +1,4 @@
-import { Rule } from '@unocss/core';
+import type { Rule } from '@unocss/core';
 import { globalKeywords } from '../constants';
 import pollen from '../pollen';
 import { createCornerRules, createDirectionRules } from '../utils';

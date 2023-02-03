@@ -1,4 +1,4 @@
-import { Rule } from '@unocss/core';
+import type { Rule } from '@unocss/core';
 import { makeGlobalStaticRules } from '../utils';
 
 export const placement: Rule[] = [

@@ -1,4 +1,4 @@
-import { Rule } from '@unocss/core';
+import type { Rule } from '@unocss/core';
 import { globalKeywords } from '../constants';
 
 export const position: Rule[] = [
