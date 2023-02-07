@@ -1,5 +1,6 @@
 <script lang="ts">
 	import RadialMenu from '$/components/RadialMenu.svelte';
+	import { fade } from 'svelte/transition';
 
 	type MenuItem = {
 		icon: string;
@@ -18,21 +19,45 @@
 	] satisfies MenuItem[];
 
 	let numItems = 6;
+
+	let holdingMouse = false;
+
+	function onMouseDown(e: MouseEvent) {
+		const el = e.target as HTMLElement;
+		if (el.tagName !== 'BODY') return;
+		holdingMouse = true;
+	}
 </script>
+
+<svelte:window
+	on:mousedown={onMouseDown}
+	on:mouseup={() => {
+		holdingMouse = false;
+	}}
+/>
 
 <div class="input-wrapper">
 	<label for="numItems">Number of menu items: <b>{numItems}</b></label>
-	<input
-		name="numItems"
-		type="range"
-		min="3"
-		max={menuItems.length}
-		bind:value={numItems}
-		on:mousedown={(e) => {
-			e.stopPropagation();
-		}}
-	/>
+	<input name="numItems" type="range" min="3" max={menuItems.length} bind:value={numItems} />
 </div>
+
+{#if !holdingMouse}
+	<p class="tutorial" transition:fade={{ duration: 150 }}>
+		Click and drag anywhere to see the menu.
+	</p>
+{/if}
+
+<p class="credits">
+	<span>
+		Done by
+		<a href="https://www.thomasglopes.com/" target="_blank" rel="noreferrer">Thomas G. Lopes</a>
+	</span>
+	<span>
+		Based on <a href="https://twitter.com/raunofreiberg" target="_blank" rel="noreferrer">Rauno's</a
+		>
+		<a href="https://rauno.me/craft/radial-menu" target="_blank" rel="noreferrer">Work</a>
+	</span>
+</p>
 
 <RadialMenu menuItems={menuItems.slice(0, numItems)} />
 
@@ -49,5 +74,27 @@
 		input {
 			color: red;
 		}
+	}
+
+	p {
+		text-align: center;
+	}
+
+	.tutorial {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		translate: -50% -50%;
+		pointer-events: none;
+	}
+
+	.credits {
+		position: absolute;
+		bottom: 16px;
+		left: 50%;
+		translate: -50% 0;
+
+		display: grid;
+		gap: 4px;
 	}
 </style>

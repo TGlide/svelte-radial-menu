@@ -11,7 +11,7 @@
 	import { onMount } from 'svelte';
 	import { getAngleDifference, normalizeAngle, round } from '$/helpers/math';
 
-	const itemOffset = 90;
+	const ITEM_OFFSET = 90;
 
 	export let menuItems: MenuItem[];
 
@@ -51,7 +51,7 @@
 
 		const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
-		const normalizedAngle = normalizeAngle(angle - itemOffset);
+		const normalizedAngle = normalizeAngle(angle - ITEM_OFFSET);
 
 		const stepAngle = 360 / menuItems.length;
 
@@ -103,15 +103,19 @@
 	].join(';');
 
 	function getItemStyle(i: number) {
-		const rotate = (360 / menuItems.length) * i - itemOffset;
+		const rotate = (360 / menuItems.length) * i - ITEM_OFFSET;
 		return `--rotate: ${rotate}deg`;
+	}
+
+	function onMouseDown(e: MouseEvent) {
+		const el = e.target as HTMLElement;
+		if (el.tagName !== 'BODY') return;
+		clickCoords = [e.clientX, e.clientY];
 	}
 </script>
 
 <svelte:window
-	on:mousedown={(e) => {
-		clickCoords = [e.clientX, e.clientY];
-	}}
+	on:mousedown={onMouseDown}
 	on:mouseup={() => {
 		clickCoords = null;
 		selected = null;
