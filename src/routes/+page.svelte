@@ -5,43 +5,45 @@
 	};
 
 	const menuItems = [
-		{ icon: 'reload', label: 'Reload' },
+		{ icon: 'printer', label: 'Print' },
+		{ icon: 'arrow-left', label: 'Arrow left' },
 		{ icon: 'printer', label: 'print' },
 		{ icon: 'reload', label: 'Reload' },
-		{ icon: 'printer', label: 'print' },
-		{ icon: 'reload', label: 'Reload' },
+		{ icon: 'arrow-right', label: 'Forward' },
 		{ icon: 'printer', label: 'print' },
 		{ icon: 'printer', label: 'print' },
 		{ icon: 'printer', label: 'print' },
 	] satisfies MenuItem[];
 
-	let numItems = 6;
+	let numItems = 3;
 
-	$: skew = (function getSkew() {
+	$: [skew, top, left] = (function getProperties() {
 		switch (numItems) {
 			case 3:
-				return -30;
+				return [-30, 48, 40];
+			case 4:
+				return [0, 55, 55];
 			case 5:
-				return 18;
+				return [18, 62, 59];
 			case 6:
-				return 30;
+				return [30, 66, 63];
 			case 7:
-				return 38.5;
+				return [38.5, 69, 65];
 			case 8:
-				return 45;
+				return [45, 72, 65];
 			default:
-				return 0;
+				return [0];
 		}
 	})();
-</script>
 
-<div class="w-12 h-12 border-red-5 border-solid bg-cyan-8 bg-green-5" />
+	$: style = [`--skew: ${skew}deg`, `--top: ${top}%`, `--left: ${left}%`].join(';');
+</script>
 
 <div class="input-wrapper">
 	<input type="range" min="3" max={menuItems.length} bind:value={numItems} />
 </div>
 
-<ul class="radial-menu" style:--skew={`${skew}deg`}>
+<ul class="radial-menu" {style}>
 	{#each menuItems.slice(0, numItems) as item, i}
 		{@const rotate = (360 / numItems) * i - 90}
 		<li class="item" style:--rotate={`${rotate}deg`}>
@@ -119,11 +121,10 @@
 
 		i {
 			position: absolute;
-			top: 70%;
-			left: 70%;
+			top: var(--top);
+			left: var(--left);
 
 			transform: skew(calc(var(--skew) * -1)) rotate(calc(var(--rotate) * -1));
-			translate: -50% -50%;
 			font-size: 1.5rem;
 		}
 	}
