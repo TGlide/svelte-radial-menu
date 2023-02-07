@@ -17,11 +17,21 @@
 		{ icon: 'printer', label: 'Print' },
 	] satisfies MenuItem[];
 
-	let numItems = 6;
+	let numItems = 5;
 </script>
 
 <div class="input-wrapper">
-	<input type="range" min="3" max={menuItems.length} bind:value={numItems} />
+	<label for="numItems">Number of menu items: <b>{numItems}</b></label>
+	<input
+		name="numItems"
+		type="range"
+		min="3"
+		max={menuItems.length}
+		bind:value={numItems}
+		on:mousedown={(e) => {
+			e.stopPropagation();
+		}}
+	/>
 </div>
 
 <RadialMenu menuItems={menuItems.slice(0, numItems)} />
@@ -32,6 +42,9 @@
 		top: 128px;
 		left: 50%;
 		translate: -50% 0;
+
+		display: grid;
+		gap: 4px;
 
 		input {
 			color: red;

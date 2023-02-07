@@ -13,37 +13,54 @@
 	export let menuItems: MenuItem[];
 
 	let selected: number | null = null;
+	let clickCoords: [number, number] | null = null;
 	let mouseCoords: [number, number] | null = null;
 
-	$: [skew, top, left] = (function getProperties() {
+	$: [skew, top, left, angleOffset, ringPercent] = (function getProperties() {
 		switch (menuItems.length) {
 			case 3:
-				return [-30, 48, 40];
+				return [-30, 48, 40, 60, 66.6];
 			case 4:
-				return [0, 55, 55];
+				return [0, 55, 55, 90, 74.9];
 			case 5:
-				return [18, 62, 59];
+				return [18, 62, 59, 108, 80];
 			case 6:
-				return [30, 66, 63];
+				return [30, 66, 63, 120, 83.2];
 			case 7:
-				return [38.5, 69, 65];
+				return [38.5, 69, 65, 128.7, 85.7];
 			case 8:
-				return [45, 72, 65];
+				return [45, 72, 65, 135, 87.4];
 			default:
-				return [0];
+				return [0, 0, 0, 0, 0];
 		}
 	})();
 
-	$: selectedAngle = (function getSelectedAngle() {
-		if (selected === null) return null;
-		const newSelected = (360 / menuItems.length) * selected - 120;
+	function getSelectedAngle(index: number | null) {
+		if (index === null) return null;
+		const newSelected = (360 / menuItems.length) * index - angleOffset;
 
 		const options = [newSelected, newSelected + 360, newSelected - 360];
 		// get the closest angle to the current eased angle
-		return options.reduce((prev, curr) => {
+		const closest = options.reduce((prev, curr) => {
 			return Math.abs(curr - (easedAngle || 0)) < Math.abs(prev - (easedAngle || 0)) ? curr : prev;
 		}, options[0]);
-	})();
+
+		console.log(
+			JSON.stringify(
+				{
+					easedAngle,
+					options,
+					closest,
+				},
+				null,
+				2,
+			),
+		);
+
+		return closest;
+	}
+
+	$: selectedAngle = getSelectedAngle(selected);
 
 	let easedAngle: number | null = null;
 
@@ -69,9 +86,10 @@
 		`--skew: ${skew}deg`,
 		`--top: ${top}%`,
 		`--left: ${left}%`,
-		`--mouseX: ${mouseCoords ? mouseCoords[0] : 0}px`,
-		`--mouseY: ${mouseCoords ? mouseCoords[1] : 0}px`,
+		`--mouseX: ${clickCoords ? clickCoords[0] : 0}px`,
+		`--mouseY: ${clickCoords ? clickCoords[1] : 0}px`,
 		`--selectedAngle: ${easedAngle}deg`,
+		`--ringPercent: ${ringPercent}%`,
 	].join(';');
 
 	function getItemStyle(i: number) {
@@ -82,15 +100,18 @@
 
 <svelte:window
 	on:mousedown={(e) => {
-		mouseCoords = [e.clientX, e.clientY];
+		clickCoords = [e.clientX, e.clientY];
 	}}
 	on:mouseup={() => {
-		// mouseCoords = null;
+		clickCoords = null;
 		selected = null;
+	}}
+	on:mousemove={(e) => {
+		mouseCoords = [e.clientX, e.clientY];
 	}}
 />
 
-{#if mouseCoords}
+{#if clickCoords}
 	<div
 		class="radial-menu-wrapper"
 		{style}
@@ -146,7 +167,7 @@
 		&[data-has-selected='true'] {
 			background: conic-gradient(
 				from var(--selectedAngle),
-				var(--color-gray-11) 83.2%,
+				var(--color-gray-11) var(--ringPercent),
 				var(--color-gray-9) 0,
 				var(--color-gray-9) 100%
 			);
@@ -176,8 +197,6 @@
 
 		width: $size;
 		height: $size;
-
-		user-select: none;
 	}
 
 	.inner {

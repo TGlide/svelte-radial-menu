@@ -19,6 +19,9 @@ body {
 
 	font-family: var(--font-sans);
 
+	user-select: none;
+	overflow: hidden;
+
 	// Ensure the body occupies the full viewport height, ignoring the
 	// mobile browser's address bar and other UI elements.
 	// height: calc(100% - env(safe-area-inset-top));
