@@ -6,7 +6,7 @@
 
 	const menuItems = [
 		{ icon: 'printer', label: 'Print' },
-		{ icon: 'arrow-left', label: 'Arrow left' },
+		{ icon: 'arrow-left', label: 'Back' },
 		{ icon: 'printer', label: 'print' },
 		{ icon: 'reload', label: 'Reload' },
 		{ icon: 'arrow-right', label: 'Forward' },
@@ -15,7 +15,8 @@
 		{ icon: 'printer', label: 'print' },
 	] satisfies MenuItem[];
 
-	let numItems = 3;
+	let numItems = 6;
+	let selected: number | null = null;
 
 	$: [skew, top, left] = (function getProperties() {
 		switch (numItems) {
@@ -46,10 +47,21 @@
 <ul class="radial-menu" {style}>
 	{#each menuItems.slice(0, numItems) as item, i}
 		{@const rotate = (360 / numItems) * i - 90}
-		<li class="item" style:--rotate={`${rotate}deg`}>
+		<li
+			class="item"
+			role="button"
+			style:--rotate={`${rotate}deg`}
+			on:mouseover={() => (selected = i)}
+			on:focus={() => (selected = i)}
+			on:mouseout={() => (selected = null)}
+			on:blur={() => (selected = null)}
+		>
 			<i class={`ti ti-${item.icon}`} />
 		</li>
 	{/each}
+	{#if selected !== null}
+		<span class="label">{menuItems[selected].label}</span>
+	{/if}
 </ul>
 
 <style lang="scss">
@@ -94,6 +106,14 @@
 			width: $innerSize;
 			height: $innerSize;
 		}
+	}
+
+	.label {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		translate: -50% -50%;
+		z-index: 999;
 	}
 
 	.item {
