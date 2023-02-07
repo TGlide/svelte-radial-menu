@@ -9,14 +9,18 @@
 	import { scale } from 'svelte/transition';
 	import { sineInOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
+	import { getAngleDifference, normalizeAngle, round } from '$/helpers/math';
+
+	const itemOffset = 90;
 
 	export let menuItems: MenuItem[];
 
 	let selected: number | null = null;
+	let innerFocused: boolean = false;
 	let clickCoords: [number, number] | null = null;
 	let mouseCoords: [number, number] | null = null;
 
-	$: [skew, top, left, angleOffset, ringPercent] = (function getProperties() {
+	$: [skew, top, left, ringAngleOffset, ringPercent] = (function getProperties() {
 		switch (menuItems.length) {
 			case 3:
 				return [-30, 48, 40, 60, 66.6];
@@ -35,43 +39,49 @@
 		}
 	})();
 
-	function getSelectedAngle(index: number | null) {
+	$: selected = (function getMouseSelection() {
+		// Given the distance between the center of the menu (clickCoords) and the mouse,
+		// selects the given menu item.
+		if (clickCoords === null || mouseCoords === null || innerFocused) return null;
+
+		const [clickX, clickY] = clickCoords;
+		const [mouseX, mouseY] = mouseCoords;
+		const dx = mouseX - clickX;
+		const dy = mouseY - clickY;
+
+		const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+		const normalizedAngle = normalizeAngle(angle - itemOffset);
+
+		const stepAngle = 360 / menuItems.length;
+
+		return Math.floor(normalizedAngle / stepAngle);
+	})();
+
+	function getRingAngle(index: number | null): number | null {
 		if (index === null) return null;
-		const newSelected = (360 / menuItems.length) * index - angleOffset;
 
-		const options = [newSelected, newSelected + 360, newSelected - 360];
-		// get the closest angle to the current eased angle
-		const closest = options.reduce((prev, curr) => {
-			return Math.abs(curr - (easedAngle || 0)) < Math.abs(prev - (easedAngle || 0)) ? curr : prev;
-		}, options[0]);
+		const newAngle = normalizeAngle((360 / menuItems.length) * index - ringAngleOffset);
+		if (ringAngle === null) return newAngle;
+		const oldAngle = normalizeAngle(ringAngle || 0);
 
-		console.log(
-			JSON.stringify(
-				{
-					easedAngle,
-					options,
-					closest,
-				},
-				null,
-				2,
-			),
-		);
+		const diff = getAngleDifference(oldAngle, newAngle);
 
-		return closest;
+		return ringAngle + diff;
 	}
 
-	$: selectedAngle = getSelectedAngle(selected);
+	$: ringAngle = getRingAngle(selected);
 
-	let easedAngle: number | null = null;
+	let easedRingAngle: number | null = null;
 
 	onMount(() => {
 		const frame = window.requestAnimationFrame(function animate() {
-			if (selectedAngle === null) {
-				easedAngle = null;
-			} else if (easedAngle === null) {
-				easedAngle = selectedAngle;
+			if (ringAngle === null) {
+				easedRingAngle = null;
+			} else if (easedRingAngle === null) {
+				easedRingAngle = ringAngle;
 			} else {
-				easedAngle += (selectedAngle - easedAngle) * 0.1;
+				easedRingAngle = round(easedRingAngle + (ringAngle - easedRingAngle) * 0.1, 2);
 			}
 
 			window.requestAnimationFrame(animate);
@@ -88,12 +98,12 @@
 		`--left: ${left}%`,
 		`--mouseX: ${clickCoords ? clickCoords[0] : 0}px`,
 		`--mouseY: ${clickCoords ? clickCoords[1] : 0}px`,
-		`--selectedAngle: ${easedAngle}deg`,
+		`--selectedAngle: ${easedRingAngle}deg`,
 		`--ringPercent: ${ringPercent}%`,
 	].join(';');
 
 	function getItemStyle(i: number) {
-		const rotate = (360 / menuItems.length) * i - 90;
+		const rotate = (360 / menuItems.length) * i - itemOffset;
 		return `--rotate: ${rotate}deg`;
 	}
 </script>
@@ -120,17 +130,17 @@
 		<div class="ring" data-has-selected={selected !== null} />
 		<ul class="radial-menu">
 			{#each menuItems.slice(0, menuItems.length) as item, i}
-				<li
-					class="item"
-					style={getItemStyle(i)}
-					data-selected={selected === i}
-					on:mouseover={() => (selected = i)}
-					on:focus={() => (selected = i)}
-				>
+				<li class="item" style={getItemStyle(i)} data-selected={selected === i}>
 					<i class={`ti ti-${item.icon}`} />
 				</li>
 			{/each}
-			<div class="inner" on:mouseover={() => (selected = null)} on:focus={() => (selected = null)}>
+			<div
+				class="inner"
+				on:mouseover={() => (innerFocused = true)}
+				on:focus={() => (innerFocused = true)}
+				on:mouseout={() => (innerFocused = false)}
+				on:blur={() => (innerFocused = false)}
+			>
 				{#if selected !== null}
 					<span class="label">{menuItems[selected].label}</span>
 				{/if}

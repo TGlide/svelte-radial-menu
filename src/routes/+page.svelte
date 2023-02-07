@@ -13,11 +13,11 @@
 		{ icon: 'reload', label: 'Reload' },
 		{ icon: 'arrow-right', label: 'Forward' },
 		{ icon: 'activity', label: 'Activity' },
-		{ icon: 'printer', label: 'Print' },
+		{ icon: 'pizza', label: 'Eat!' },
 		{ icon: 'printer', label: 'Print' },
 	] satisfies MenuItem[];
 
-	let numItems = 5;
+	let numItems = 6;
 </script>
 
 <div class="input-wrapper">
