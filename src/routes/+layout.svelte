@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '$/styles/index.scss';
-	import 'uno.css';
+	import '../../node_modules/@tabler/icons-webfont/tabler-icons.min.css';
 </script>
 
 <slot />

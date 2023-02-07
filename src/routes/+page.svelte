@@ -35,6 +35,8 @@
 	})();
 </script>
 
+<div class="w-12 h-12 border-red-5 border-solid bg-cyan-8 bg-green-5" />
+
 <div class="input-wrapper">
 	<input type="range" min="3" max={menuItems.length} bind:value={numItems} />
 </div>
@@ -43,7 +45,7 @@
 	{#each menuItems.slice(0, numItems) as item, i}
 		{@const rotate = (360 / numItems) * i - 90}
 		<li class="item" style:--rotate={`${rotate}deg`}>
-			<div class={`icon i-tabler-${item.icon}`} />
+			<i class={`ti ti-${item.icon}`} />
 		</li>
 	{/each}
 </ul>
@@ -115,7 +117,7 @@
 			cursor: pointer;
 		}
 
-		.icon {
+		i {
 			position: absolute;
 			top: 70%;
 			left: 70%;
