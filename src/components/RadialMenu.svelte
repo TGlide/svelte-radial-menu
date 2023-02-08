@@ -129,13 +129,15 @@
 	}}
 	on:touchend={() => {
 		clickCoords = null;
+		mouseCoords = null;
 	}}
 	on:mousedown={onMouseDown}
-	on:mouseup={() => {
-		clickCoords = null;
-	}}
 	on:mousemove={(e) => {
 		mouseCoords = [e.clientX, e.clientY];
+	}}
+	on:mouseup={() => {
+		clickCoords = null;
+		mouseCoords = null;
 	}}
 />
 
