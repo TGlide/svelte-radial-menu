@@ -111,6 +111,7 @@
 		const el = e.target as HTMLElement;
 		if (el.tagName !== 'BODY') return;
 		clickCoords = [e.clientX, e.clientY];
+		innerFocused = true;
 	}
 </script>
 
@@ -118,7 +119,6 @@
 	on:mousedown={onMouseDown}
 	on:mouseup={() => {
 		clickCoords = null;
-		selected = null;
 	}}
 	on:mousemove={(e) => {
 		mouseCoords = [e.clientX, e.clientY];
@@ -134,6 +134,7 @@
 		<div class="ring" data-has-selected={selected !== null} />
 		<ul class="radial-menu">
 			{#each menuItems.slice(0, menuItems.length) as item, i}
+				{selected === i && console.log(item.label, selected === i, selected, i)}
 				<li class="item" style={getItemStyle(i)} data-selected={selected === i}>
 					<i class={`ti ti-${item.icon}`} />
 				</li>
