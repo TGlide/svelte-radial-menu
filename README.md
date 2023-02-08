@@ -23,7 +23,7 @@
 - [Table of Contents](#table-of-contents)
 - [Description](#description)
 - [Future of this project](#future-of-this-project)
-  - [Installation](#installation)
+- [Installation](#installation)
     - [1. Clone the repo](#1-clone-the-repo)
     - [2. Install dependencies](#2-install-dependencies)
 - [Usage](#usage)
@@ -51,7 +51,7 @@ If this gains traction, I'll add more features to it. Some of the features I tho
 - [ ] Different triggers (e.g. ctrl + hold click)
 - [ ] Theming (?)
 
-### Installation
+## Installation
 
 #### 1. Clone the repo
 
