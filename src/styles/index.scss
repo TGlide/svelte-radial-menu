@@ -11,6 +11,7 @@
 
 html {
 	height: 100%;
+	overflow: hidden;
 }
 
 body {
@@ -28,6 +29,8 @@ body {
 
 	/* Prevent zoom gestures */
 	touch-action: pan-x pan-y;
+
+	position: relative;
 }
 
 a {

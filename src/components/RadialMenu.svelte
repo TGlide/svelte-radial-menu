@@ -16,7 +16,6 @@
 	export let menuItems: MenuItem[];
 
 	let selected: number | null = null;
-	let innerFocused: boolean = false;
 	let clickCoords: [number, number] | null = null;
 	let mouseCoords: [number, number] | null = null;
 
@@ -42,18 +41,21 @@
 	$: selected = (function getMouseSelection() {
 		// Given the distance between the center of the menu (clickCoords) and the mouse,
 		// selects the given menu item.
-		if (clickCoords === null || mouseCoords === null || innerFocused) return null;
+		if (clickCoords === null || mouseCoords === null) return null;
 
 		const [clickX, clickY] = clickCoords;
 		const [mouseX, mouseY] = mouseCoords;
 		const dx = mouseX - clickX;
 		const dy = mouseY - clickY;
 
+		const distance = Math.sqrt(dx * dx + dy * dy);
+		if (distance < 80) return null;
+
 		const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-
 		const normalizedAngle = normalizeAngle(angle - ITEM_OFFSET);
-
 		const stepAngle = 360 / menuItems.length;
+
+		console.log(normalizedAngle);
 
 		return Math.floor(normalizedAngle / stepAngle);
 	})();
@@ -109,13 +111,25 @@
 
 	function onMouseDown(e: MouseEvent) {
 		const el = e.target as HTMLElement;
-		if (el.tagName !== 'BODY') return;
+		if (!['BODY', 'HTML', 'MAIN'].includes(el.tagName)) return;
 		clickCoords = [e.clientX, e.clientY];
-		innerFocused = true;
+	}
+
+	function onTouchStart(e: TouchEvent) {
+		const el = e.target as HTMLElement;
+		if (!['BODY', 'HTML', 'MAIN'].includes(el.tagName)) return;
+		clickCoords = [e.touches[0].clientX, e.touches[0].clientY];
 	}
 </script>
 
 <svelte:window
+	on:touchstart={onTouchStart}
+	on:touchmove={(e) => {
+		mouseCoords = [e.touches[0].clientX, e.touches[0].clientY];
+	}}
+	on:touchend={() => {
+		clickCoords = null;
+	}}
 	on:mousedown={onMouseDown}
 	on:mouseup={() => {
 		clickCoords = null;
@@ -139,13 +153,7 @@
 					<i class={`ti ti-${item.icon}`} />
 				</li>
 			{/each}
-			<div
-				class="inner"
-				on:mouseover={() => (innerFocused = true)}
-				on:focus={() => (innerFocused = true)}
-				on:mouseout={() => (innerFocused = false)}
-				on:blur={() => (innerFocused = false)}
-			>
+			<div class="inner">
 				{#if selected !== null}
 					<span class="label">{menuItems[selected].label}</span>
 				{/if}
