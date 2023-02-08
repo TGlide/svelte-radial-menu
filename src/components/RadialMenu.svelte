@@ -81,7 +81,7 @@
 			} else if (easedRingAngle === null) {
 				easedRingAngle = ringAngle;
 			} else {
-				easedRingAngle = round(easedRingAngle + (ringAngle - easedRingAngle) * 0.1, 2);
+				easedRingAngle = round(easedRingAngle + (ringAngle - easedRingAngle) * 0.09, 2);
 			}
 
 			window.requestAnimationFrame(animate);
