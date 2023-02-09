@@ -109,17 +109,25 @@
 		return `--rotate: ${rotate}deg`;
 	}
 
+	function setBodyUserSelect(val: string) {
+		document.body.style.userSelect = val;
+		document.body.style.webkitUserSelect = val;
+		// @ts-ignore
+		document.body.style.webkitTouchCallout = val;
+	}
+
 	function onMouseDown(e: MouseEvent) {
 		const el = e.target as HTMLElement;
 		if (!['BODY', 'HTML', 'MAIN'].includes(el.tagName)) return;
 		clickCoords = [e.clientX, e.clientY];
-		document.body.style.cursor = 'move';
+		setBodyUserSelect('none');
 	}
 
 	function onTouchStart(e: TouchEvent) {
 		const el = e.target as HTMLElement;
 		if (!['BODY', 'HTML', 'MAIN'].includes(el.tagName)) return;
 		clickCoords = [e.touches[0].clientX, e.touches[0].clientY];
+		setBodyUserSelect('none');
 	}
 </script>
 
@@ -140,6 +148,10 @@
 		clickCoords = null;
 		mouseCoords = null;
 		document.body.style.cursor = 'initial';
+		setBodyUserSelect('initial');
+	}}
+	on:touchend={() => {
+		setBodyUserSelect('initial');
 	}}
 />
 
