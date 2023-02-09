@@ -81,6 +81,22 @@
 		return ringAngle + diff;
 	})();
 
+	$: {
+		if (selected === null) {
+			console.log(1);
+			// When nothing is selected, the angle should be reset.
+			easedRingAngle.set(-1, { hard: true });
+		} else if ($easedRingAngle === -1) {
+			console.log(2, ringAngle);
+			// Coming from a reset state, no need to animate, just show the new angle.
+			easedRingAngle.set(ringAngle || 0, { hard: true });
+		} else {
+			console.log(3, ringAngle);
+			// Otherwise, we want to animate to the new angle.
+			easedRingAngle.set(ringAngle || 0);
+		}
+	}
+
 	$: style = [
 		`--skew: ${skew}deg`,
 		`--top: ${top}%`,
@@ -90,28 +106,6 @@
 		`--selectedAngle: ${$easedRingAngle}deg`,
 		`--ringPercent: ${ringPercent}%`,
 	].join(';');
-
-	// Lifecycle
-	onMount(() => {
-		const frame = window.requestAnimationFrame(function animate() {
-			if (selected === null) {
-				// When nothing is selected, the angle should be reset.
-				easedRingAngle.set(-1, { hard: true });
-			} else if ($easedRingAngle === -1) {
-				// Coming from a reset state, no need to animate, just show the new angle.
-				easedRingAngle.set(ringAngle || 0, { hard: true });
-			} else {
-				// Otherwise, we want to animate to the new angle.
-				$easedRingAngle = ringAngle ?? $easedRingAngle;
-			}
-
-			window.requestAnimationFrame(animate);
-		});
-
-		return () => {
-			window.cancelAnimationFrame(frame);
-		};
-	});
 
 	// Event Handlers
 	function getItemStyle(i: number) {
@@ -160,7 +154,7 @@
 		<div class="ring" data-has-selected={selected !== null} />
 		<ul class="radial-menu">
 			{#each menuItems.slice(0, menuItems.length) as item, i}
-				{selected === i && console.log(item.label, selected === i, selected, i)}
+				{selected === i}
 				<li class="item" style={getItemStyle(i)} data-selected={selected === i}>
 					<i class={`ti ti-${item.icon}`} />
 				</li>
