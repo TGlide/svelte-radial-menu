@@ -154,7 +154,6 @@
 		<div class="ring" data-has-selected={selected !== null} />
 		<ul class="radial-menu">
 			{#each menuItems.slice(0, menuItems.length) as item, i}
-				{selected === i}
 				<li class="item" style={getItemStyle(i)} data-selected={selected === i}>
 					<i class={`ti ti-${item.icon}`} />
 				</li>
