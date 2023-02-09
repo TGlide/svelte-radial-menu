@@ -18,7 +18,9 @@
 	export let menuItems: MenuItem[];
 
 	// Variables
+	let prevSelected: Array<number | null> = [null, null];
 	let selected: number | null = null;
+	$: prevSelected = [prevSelected[1], selected];
 	let clickCoords: [number, number] | null = null;
 	let mouseCoords: [number, number] | null = null;
 	let innerEl: HTMLElement | null = null;
@@ -26,8 +28,11 @@
 		stiffness: 0.04,
 		damping: 0.19,
 	});
+	let windowWidth: number | null = null;
 
 	// Reactive values
+	$: isMobile = windowWidth && windowWidth < 768;
+
 	$: [skew, top, left, ringAngleOffset, ringPercent] = (function getProperties() {
 		switch (menuItems.length) {
 			case 3:
@@ -81,16 +86,21 @@
 	})();
 
 	$: {
-		if (selected === null) {
-			// When nothing is selected, the angle should be reset.
-			easedRingAngle.set(-1, { hard: true });
-		} else if ($easedRingAngle === -1) {
-			// Coming from a reset state, no need to animate, just show the new angle.
-			easedRingAngle.set(ringAngle || 0, { hard: true });
-		} else {
-			// Otherwise, we want to animate to the new angle.
-			easedRingAngle.set(ringAngle || 0);
-		}
+		(function animateRingAngleJs() {
+			// JS animation in mobile is too slow, so we use CSS instead.
+			if (isMobile) return;
+
+			if (selected === null) {
+				// When nothing is selected, the angle should be reset.
+				easedRingAngle.set(-1, { hard: true });
+			} else if ($easedRingAngle === -1) {
+				// Coming from a reset state, no need to animate, just show the new angle.
+				easedRingAngle.set(ringAngle || 0, { hard: true });
+			} else {
+				// Otherwise, we want to animate to the new angle.
+				easedRingAngle.set(ringAngle || 0);
+			}
+		})();
 	}
 
 	$: style = [
@@ -99,9 +109,14 @@
 		`--left: ${left}%`,
 		`--mouseX: ${clickCoords ? clickCoords[0] : 0}px`,
 		`--mouseY: ${clickCoords ? clickCoords[1] : 0}px`,
-		`--selectedAngle: ${$easedRingAngle}deg`,
+		`--selectedAngle: ${isMobile ? ringAngle : $easedRingAngle}deg`,
 		`--ringPercent: ${ringPercent}%`,
 	].join(';');
+
+	$: ringStyle = (function getRingStyle() {
+		if (!isMobile || selected === null || prevSelected[0] === null) return;
+		return `--transition: 200ms ease`;
+	})();
 
 	// Event Handlers
 	function getItemStyle(i: number) {
@@ -141,6 +156,7 @@
 		mouseCoords = null;
 		document.body.style.cursor = 'initial';
 	}}
+	bind:innerWidth={windowWidth}
 />
 
 {#if clickCoords}
@@ -149,7 +165,7 @@
 		{style}
 		transition:scale={{ start: 0.9, duration: 150, easing: sineInOut }}
 	>
-		<div class="ring" data-has-selected={selected !== null} />
+		<div class="ring" data-has-selected={selected !== null} style={ringStyle} />
 		<ul class="radial-menu">
 			{#each menuItems.slice(0, menuItems.length) as item, i}
 				<li class="item" style={getItemStyle(i)} data-selected={selected === i}>
@@ -192,11 +208,13 @@
 
 		&[data-has-selected='true'] {
 			background: conic-gradient(
-				from var(--selectedAngle),
+				from 0deg,
 				var(--color-gray-11) var(--ringPercent),
 				var(--color-gray-9) 0,
 				var(--color-gray-9) 100%
 			);
+			transform: rotate(var(--selectedAngle));
+			transition: var(--transition);
 		}
 
 		&::after {
