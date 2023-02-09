@@ -120,6 +120,7 @@
 		const el = e.target as HTMLElement;
 		if (!['BODY', 'HTML', 'MAIN'].includes(el.tagName)) return;
 		clickCoords = [e.clientX, e.clientY];
+		document.body.style.cursor = 'move';
 		setBodyUserSelect('none');
 	}
 
