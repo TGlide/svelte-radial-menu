@@ -10,15 +10,25 @@
 	import { sineInOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 	import { getAngleDifference, normalizeAngle, round } from '$/helpers/math';
+	import { spring } from 'svelte/motion';
 
+	// Constants
 	const ITEM_OFFSET = 90;
 
+	// Props
 	export let menuItems: MenuItem[];
 
+	// Variables
 	let selected: number | null = null;
 	let clickCoords: [number, number] | null = null;
 	let mouseCoords: [number, number] | null = null;
+	let innerEl: HTMLElement | null = null;
+	let easedRingAngle = spring(-1, {
+		stiffness: 0.04,
+		damping: 0.19,
+	});
 
+	// Reactive values
 	$: [skew, top, left, ringAngleOffset, ringPercent] = (function getProperties() {
 		switch (menuItems.length) {
 			case 3:
@@ -49,41 +59,50 @@
 		const dy = mouseY - clickY;
 
 		const distance = Math.sqrt(dx * dx + dy * dy);
-		if (distance < 80) return null;
+		const innerRadius = innerEl ? innerEl.getBoundingClientRect().width / 2 : 0;
+		if (distance < innerRadius) return null;
 
 		const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 		const normalizedAngle = normalizeAngle(angle - ITEM_OFFSET);
 		const stepAngle = 360 / menuItems.length;
 
-		console.log(normalizedAngle);
-
 		return Math.floor(normalizedAngle / stepAngle);
 	})();
 
-	function getRingAngle(index: number | null): number | null {
-		if (index === null) return null;
+	$: ringAngle = (function getRingAngle(): number | null {
+		if (selected === null) return null;
 
-		const newAngle = normalizeAngle((360 / menuItems.length) * index - ringAngleOffset);
+		const newAngle = normalizeAngle((360 / menuItems.length) * selected - ringAngleOffset);
 		if (ringAngle === null) return newAngle;
 		const oldAngle = normalizeAngle(ringAngle || 0);
 
 		const diff = getAngleDifference(oldAngle, newAngle);
 
 		return ringAngle + diff;
-	}
+	})();
 
-	$: ringAngle = getRingAngle(selected);
+	$: style = [
+		`--skew: ${skew}deg`,
+		`--top: ${top}%`,
+		`--left: ${left}%`,
+		`--mouseX: ${clickCoords ? clickCoords[0] : 0}px`,
+		`--mouseY: ${clickCoords ? clickCoords[1] : 0}px`,
+		`--selectedAngle: ${$easedRingAngle}deg`,
+		`--ringPercent: ${ringPercent}%`,
+	].join(';');
 
-	let easedRingAngle: number | null = null;
-
+	// Lifecycle
 	onMount(() => {
 		const frame = window.requestAnimationFrame(function animate() {
-			if (ringAngle === null) {
-				easedRingAngle = null;
-			} else if (easedRingAngle === null) {
-				easedRingAngle = ringAngle;
+			if (selected === null) {
+				// When nothing is selected, the angle should be reset.
+				easedRingAngle.set(-1, { hard: true });
+			} else if ($easedRingAngle === -1) {
+				// Coming from a reset state, no need to animate, just show the new angle.
+				easedRingAngle.set(ringAngle || 0, { hard: true });
 			} else {
-				easedRingAngle = round(easedRingAngle + (ringAngle - easedRingAngle) * 0.09, 2);
+				// Otherwise, we want to animate to the new angle.
+				$easedRingAngle = ringAngle ?? $easedRingAngle;
 			}
 
 			window.requestAnimationFrame(animate);
@@ -94,16 +113,7 @@
 		};
 	});
 
-	$: style = [
-		`--skew: ${skew}deg`,
-		`--top: ${top}%`,
-		`--left: ${left}%`,
-		`--mouseX: ${clickCoords ? clickCoords[0] : 0}px`,
-		`--mouseY: ${clickCoords ? clickCoords[1] : 0}px`,
-		`--selectedAngle: ${easedRingAngle}deg`,
-		`--ringPercent: ${ringPercent}%`,
-	].join(';');
-
+	// Event Handlers
 	function getItemStyle(i: number) {
 		const rotate = (360 / menuItems.length) * i - ITEM_OFFSET;
 		return `--rotate: ${rotate}deg`;
@@ -155,12 +165,12 @@
 					<i class={`ti ti-${item.icon}`} />
 				</li>
 			{/each}
-			<div class="inner">
-				{#if selected !== null}
-					<span class="label">{menuItems[selected].label}</span>
-				{/if}
-			</div>
 		</ul>
+		<div class="inner" bind:this={innerEl}>
+			{#if selected !== null}
+				<span class="label">{menuItems[selected].label}</span>
+			{/if}
+		</div>
 	</div>
 {/if}
 
