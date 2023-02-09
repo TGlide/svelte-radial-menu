@@ -6,11 +6,10 @@
 </script>
 
 <script lang="ts">
-	import { scale } from 'svelte/transition';
+	import { getAngleDifference, normalizeAngle } from '$/helpers/math';
 	import { sineInOut } from 'svelte/easing';
-	import { onMount } from 'svelte';
-	import { getAngleDifference, normalizeAngle, round } from '$/helpers/math';
 	import { spring } from 'svelte/motion';
+	import { scale } from 'svelte/transition';
 
 	// Constants
 	const ITEM_OFFSET = 90;
@@ -51,7 +50,7 @@
 	$: selected = (function getMouseSelection() {
 		// Given the distance between the center of the menu (clickCoords) and the mouse,
 		// selects the given menu item.
-		if (clickCoords === null || mouseCoords === null) return null;
+		if (clickCoords === null || mouseCoords === null || !innerEl) return null;
 
 		const [clickX, clickY] = clickCoords;
 		const [mouseX, mouseY] = mouseCoords;
@@ -59,7 +58,7 @@
 		const dy = mouseY - clickY;
 
 		const distance = Math.sqrt(dx * dx + dy * dy);
-		const innerRadius = innerEl ? innerEl.getBoundingClientRect().width / 2 : 0;
+		const innerRadius = innerEl.getBoundingClientRect().width / 2;
 		if (distance < innerRadius) return null;
 
 		const angle = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -83,15 +82,12 @@
 
 	$: {
 		if (selected === null) {
-			console.log(1);
 			// When nothing is selected, the angle should be reset.
 			easedRingAngle.set(-1, { hard: true });
 		} else if ($easedRingAngle === -1) {
-			console.log(2, ringAngle);
 			// Coming from a reset state, no need to animate, just show the new angle.
 			easedRingAngle.set(ringAngle || 0, { hard: true });
 		} else {
-			console.log(3, ringAngle);
 			// Otherwise, we want to animate to the new angle.
 			easedRingAngle.set(ringAngle || 0);
 		}
@@ -117,6 +113,7 @@
 		const el = e.target as HTMLElement;
 		if (!['BODY', 'HTML', 'MAIN'].includes(el.tagName)) return;
 		clickCoords = [e.clientX, e.clientY];
+		document.body.style.cursor = 'move';
 	}
 
 	function onTouchStart(e: TouchEvent) {
@@ -142,6 +139,7 @@
 	on:mouseup={() => {
 		clickCoords = null;
 		mouseCoords = null;
+		document.body.style.cursor = 'initial';
 	}}
 />
 
