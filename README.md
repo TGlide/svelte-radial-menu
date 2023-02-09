@@ -76,4 +76,4 @@ pnpm run dev
 
 ### Preview
 
-You can check out a live preview at [here](svelte-radial-menu.thomasglopes.com)
+You can check out a live preview [here](https://svelte-radial-menu.thomasglopes.com)
