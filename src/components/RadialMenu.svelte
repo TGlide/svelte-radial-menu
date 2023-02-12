@@ -7,6 +7,7 @@
 
 <script lang="ts">
 	import { getAngleDifference, normalizeAngle } from '$/helpers/math';
+	import { setUserSelect } from '$/helpers/style';
 	import { sineInOut } from 'svelte/easing';
 	import { spring } from 'svelte/motion';
 	import { scale } from 'svelte/transition';
@@ -114,12 +115,14 @@
 		if (!['BODY', 'HTML', 'MAIN'].includes(el.tagName)) return;
 		clickCoords = [e.clientX, e.clientY];
 		document.body.style.cursor = 'move';
+		setUserSelect(document.body, 'none');
 	}
 
 	function onTouchStart(e: TouchEvent) {
 		const el = e.target as HTMLElement;
 		if (!['BODY', 'HTML', 'MAIN'].includes(el.tagName)) return;
 		clickCoords = [e.touches[0].clientX, e.touches[0].clientY];
+		setUserSelect(document.body, 'none');
 	}
 </script>
 
@@ -131,6 +134,7 @@
 	on:touchend={() => {
 		clickCoords = null;
 		mouseCoords = null;
+		setUserSelect(document.body, 'initial');
 	}}
 	on:mousedown={onMouseDown}
 	on:mousemove={(e) => {
@@ -140,6 +144,7 @@
 		clickCoords = null;
 		mouseCoords = null;
 		document.body.style.cursor = 'initial';
+		setUserSelect(document.body, 'initial');
 	}}
 />
 
