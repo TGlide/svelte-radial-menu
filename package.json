@@ -39,6 +39,7 @@
 		"@fontsource/fira-mono": "^4.5.10",
 		"@fontsource/inter": "^4.5.15",
 		"@fontsource/montserrat": "^4.5.14",
+		"@sveltejs/adapter-node": "^5.3.2",
 		"@tabler/icons-webfont": "^2.2.0"
 	}
 }
